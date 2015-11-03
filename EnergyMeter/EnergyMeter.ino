@@ -11,10 +11,8 @@ void loop()
 {
   TFUSerial.task();
 
-  analogWrite(1, 0);
-  delay(100);
+  int calibrationValue = 508;
+  analogWrite(1, (analogRead(1) - calibrationValue) * 2);
 
-  analogWrite(1, analogRead(2));
-
-  TFUSerial.println(analogRead(2));
+  TFUSerial.println(analogRead(1) - calibrationValue);
 }
