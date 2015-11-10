@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   javaJdbc,
   cache,
   javaWs,
-  "org.usb4java" % "usb4java-javax" % "1.2.0"
+  "org.usb4java" % "usb4java" % "1.2.0"
 )
 
 // Play provides two styles of routers, one expects its actions to be injected, the
