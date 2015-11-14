@@ -1,26 +1,18 @@
-import org.junit.*;
+import org.junit.Test;
+import play.libs.F.Callback;
+import play.test.TestBrowser;
 
-import play.mvc.*;
-import play.test.*;
-import play.libs.F.*;
-
+import static org.junit.Assert.assertTrue;
 import static play.test.Helpers.*;
-import static org.junit.Assert.*;
-
-import static org.fluentlenium.core.filter.FilterConstructor.*;
 
 public class IntegrationTest {
 
-    /**
-     * add your integration test here
-     * in this example we just check if the welcome page is being shown
-     */
     @Test
-    public void test() {
+    public void testCurrent() {
         running(testServer(3333, fakeApplication(inMemoryDatabase())), HTMLUNIT, new Callback<TestBrowser>() {
             public void invoke(TestBrowser browser) {
-                browser.goTo("http://localhost:3333");
-                assertTrue(browser.pageSource().contains("Your new application is ready."));
+                browser.goTo("http://localhost:3333/current");
+                assertTrue(browser.pageSource().contains("amperage"));
             }
         });
     }
