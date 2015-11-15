@@ -11,9 +11,8 @@ libraryDependencies ++= Seq(
   cache,
   javaWs,
   "org.usb4java" % "usb4java" % "1.2.0",
-  "junit" % "junit" % "4.12" % "test"
+  "junit" % "junit" % "4.12" % "test",
+  "org.mockito" % "mockito-all" % "1.10.19" % "test"
 )
 
-// Play provides two styles of routers, one expects its actions to be injected, the
-// other, legacy style, accesses its actions statically.
 routesGenerator := InjectedRoutesGenerator

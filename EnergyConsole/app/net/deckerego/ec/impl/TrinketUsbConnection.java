@@ -1,17 +1,34 @@
-package net.deckerego.ec;
+package net.deckerego.ec.impl;
 
-import java.nio.*;
+import net.deckerego.ec.UsbConnection;
 import org.usb4java.*;
+import play.inject.ApplicationLifecycle;
+import play.libs.F;
 
-public class Trinket {
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.CharBuffer;
+import java.nio.IntBuffer;
+
+@Singleton
+public class TrinketUsbConnection implements UsbConnection {
     private static Context context;
     private static DeviceHandle trinketHandle;
 
-    public Trinket() {
+    @Inject
+    public TrinketUsbConnection(ApplicationLifecycle lifecycle) {
         if(this.context == null) this.context = init();
         if(this.trinketHandle == null) this.trinketHandle = openDevice();
+
+        lifecycle.addStopHook(() -> {
+            this.close();
+            return F.Promise.pure(null);
+        });
     }
 
+    @Override
     public void close() {
         LibUsb.close(this.trinketHandle);
         LibUsb.exit(this.context);
@@ -60,6 +77,7 @@ public class Trinket {
         return null;
     }
 
+    @Override
     public String readLine() {
         int result = LibUsb.claimInterface(trinketHandle, (short) 0x00);
         if (result != LibUsb.SUCCESS) throw new LibUsbException("Cannot open Trinket interface", result);
