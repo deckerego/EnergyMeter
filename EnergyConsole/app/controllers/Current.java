@@ -17,7 +17,8 @@ public class Current extends Controller {
 
     public Result fetch() {
         ObjectNode result = Json.newObject();
-        result.put("amperage", usbConnection.readLine());
+        result.put("amperage", usbConnection.getAmperage());
+        result.put("rms", usbConnection.getRootMeanSquared());
         return ok(result);
     }
 }

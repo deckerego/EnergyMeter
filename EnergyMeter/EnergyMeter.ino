@@ -26,14 +26,5 @@ void loop()
     sum += filtered * filtered;
   }
 
-  // Ratio used for conversion from RMS is: Ic * (V / Rdac)
-  // Where Ic is the current calibration coefficient,
-  // V is the accepted voltage of the input pin, and
-  // Rdac is the resolution of the digital/analog converter.
-  // For the current calibration coefficient, I'm assuming
-  // a 33 Ω ±1% burden resistor over a current transformer that
-  // transforms 100A to 50mA, or: (100A / 0.05A) / 33 Ω = 60.6060...
-  // I'm also assuming a 5V Trinket with a 10-bit DAC, and so:
-  // Ic * (5V / 10 bits) = 60.6060 * (5.0 / 1024) = 0.29592803030...
-  TFUSerial.println(0.2959280303030 * sqrt(sum / 1200));
+  TFUSerial.println(sqrt(sum / 1200));
 }
