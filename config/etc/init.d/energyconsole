@@ -1,100 +1,33 @@
-#! /bin/sh
+#!/bin/sh
+# kFreeBSD do not accept scripts as interpreters, using #!/bin/sh and sourcing.
+if [ true != "$INIT_D_SCRIPT_SOURCED" ] ; then
+    set "$0" "$@"; INIT_D_SCRIPT_SOURCED=true . /lib/init/init-d-script
+fi
 ### BEGIN INIT INFO
 # Provides:          energyconsole
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Energy Monitor web application
-# Description:       A Play web application to monitor energy usage
+# Short-Description: Energy Monitor API
+# Description:       Console and API for energy monitoring
 ### END INIT INFO
 
-PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Energy Monitor WebApp"
-NAME=energyconsole
+# Author: DeckerEgo <john@deckerego.net>
+
+DESC="EnergyMonitor API"
+NAME="energyconsole"
 DAEMON_PATH="/opt/$NAME"
 DAEMON="$DAEMON_PATH/bin/$NAME"
 PIDFILE="$DAEMON_PATH/RUNNING_PID"
-DAEMON_ARGS=""
-SCRIPTNAME=/etc/init.d/$NAME
 
-[ -x "$DAEMON" ] || exit 0
-
-[ -r /etc/default/$NAME ] && . /etc/default/$NAME
-
-. /lib/init/vars.sh
-. /lib/lsb/init-functions
-echo "INIT"
-
-do_start()
-{
-	start-stop-daemon --start --chuid pi --user pi --exec $DAEMON --test > /dev/null \
-		|| return 1
-	start-stop-daemon --start --chuid pi --user pi --exec $DAEMON -- \
-		$DAEMON_ARGS \
-		|| return 2
+do_start_cmd() {
+        start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
+            $START_ARGS \
+            --startas $DAEMON --name $NAME --exec $DAEMON --test > /dev/null \
+            || return 1
+        start-stop-daemon --start --background --pidfile ${PIDFILE} \
+            $START_ARGS \
+            --startas $DAEMON --name $NAME --exec $DAEMON -- $DAEMON_ARGS \
+            || return 2
 }
-
-do_stop()
-{
-	start-stop-daemon --stop --chdir $APP_PATH --user pi --retry=TERM/30/KILL/5 --pidfile $PIDFILE
-	RETVAL="$?"
-	[ "$RETVAL" = 2 ] && return 2
-	start-stop-daemon --stop --chdir $APP_PATH --oknodo --user pi --retry=0/30/KILL/5 --exec $DAEMON
-	[ "$?" = 2 ] && return 2
-
-	rm -f $PIDFILE
-	return "$RETVAL"
-}
-
-do_reload() {
-	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name $NAME
-	return 0
-}
-
-case "$1" in
-  start)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
-	do_start
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
-  stop)
-	[ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
-	do_stop
-	case "$?" in
-		0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
-		2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
-	esac
-	;;
-  status)
-	status_of_proc "$DAEMON" "$NAME" && exit 0 || exit $?
-	;;
-  restart|force-reload)
-	log_daemon_msg "Restarting $DESC" "$NAME"
-	do_stop
-	case "$?" in
-	  0|1)
-		do_start
-		case "$?" in
-			0) log_end_msg 0 ;;
-			1) log_end_msg 1 ;; # Old process is still running
-			*) log_end_msg 1 ;; # Failed to start
-		esac
-		;;
-	  *)
-		# Failed to stop
-		log_end_msg 1
-		;;
-	esac
-	;;
-  *)
-	#echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload}" >&2
-	echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
-	exit 3
-	;;
-esac
-
-:

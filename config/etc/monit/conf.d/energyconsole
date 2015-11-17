@@ -1,5 +1,5 @@
 check process energyconsole with pidfile /opt/energyconsole/RUNNING_PID
-	start "/usr/sbin/service energyconsole restart"
-	stop "/usr/sbin/service energyconsole stop"
+	start "/etc/init.d/energyconsole start"
+	stop "/etc/init.d/energyconsole stop"
 	if failed host localhost port 9000
 	then restart

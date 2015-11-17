@@ -1,0 +1,1 @@
+0-59/5 * * * * pi /bin/sh /opt/energyconsole/bin/send_adafruit.sh
